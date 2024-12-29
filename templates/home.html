@@ -1,0 +1,225 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="text-center">
+    <h1 class="homepage-title">CoachWise</h1>
+    <h4 class="homepage-subtitle">Making Coaching Accessible</h4>
+    <hr class="title-divider">
+</div>
+<br>
+
+<!-- First Row: Player and Defense Input -->
+<div class="row">
+    <div class="col-md-12 p-4">
+        <div id="explore_text">
+            <div id="edit_play_div">
+                <h5>Enter Player Details</h5>
+
+                <!-- Two columns for Player 1 to Player 4 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="player-input">
+                            <h6>Player 1</h6>
+                            <input type="text" id="player1_name" placeholder="Player 1 Name">
+                            <input type="text" id="player1_strengths" placeholder="Player 1 Strengths">
+                            <input type="text" id="player1_weaknesses" placeholder="Player 1 Weaknesses">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="player-input">
+                            <h6>Player 2</h6>
+                            <input type="text" id="player2_name" placeholder="Player 2 Name">
+                            <input type="text" id="player2_strengths" placeholder="Player 2 Strengths">
+                            <input type="text" id="player2_weaknesses" placeholder="Player 2 Weaknesses">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="player-input">
+                            <h6>Player 3</h6>
+                            <input type="text" id="player3_name" placeholder="Player 3 Name">
+                            <input type="text" id="player3_strengths" placeholder="Player 3 Strengths">
+                            <input type="text" id="player3_weaknesses" placeholder="Player 3 Weaknesses">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="player-input">
+                            <h6>Player 4</h6>
+                            <input type="text" id="player4_name" placeholder="Player 4 Name">
+                            <input type="text" id="player4_strengths" placeholder="Player 4 Strengths">
+                            <input type="text" id="player4_weaknesses" placeholder="Player 4 Weaknesses">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Single row for Player 5 -->
+                <div class="row justify-content-center">
+                    <div class="col-md-6"> <!-- Removed card class -->
+                        <div class="player-input">
+                            <h6>Player 5</h6>
+                            <input type="text" id="player5_name" placeholder="Player 5 Name">
+                            <input type="text" id="player5_strengths" placeholder="Player 5 Strengths">
+                            <input type="text" id="player5_weaknesses" placeholder="Player 5 Weaknesses">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Single row for Defense -->
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="player-input"> <!-- Added player-input class for consistency -->
+                            <h5>Enter Defense:</h5>
+                            <input type="text" id="defense_input"
+                                placeholder="Enter defense type (e.g., 3-2 Zone, Man to Man)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons for Generating Plays -->
+                <div class="text-center mt-4">
+                    <!-- Button for Offensive Play -->
+                    <button id="generate_offensive_play_btn" class="btn-primary">Generate Offensive Play</button>
+
+                    <!-- Button for Inbound Play -->
+                    <button id="generate_inbound_play_btn" class="btn-primary">Generate Inbounds Play</button>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    /* 
+        PLAY SUBMISSION 
+    */
+
+    $(function () {
+        // Collect player information when the "Submit Players" button is clicked
+        $("#generate_offensive_play_btn").click(function () {
+            var players = [
+                {
+                    name: $("#player1_name").val(),
+                    strengths: $("#player1_strengths").val(),
+                    weaknesses: $("#player1_weaknesses").val()
+                },
+                {
+                    name: $("#player2_name").val(),
+                    strengths: $("#player2_strengths").val(),
+                    weaknesses: $("#player2_weaknesses").val()
+                },
+                {
+                    name: $("#player3_name").val(),
+                    strengths: $("#player3_strengths").val(),
+                    weaknesses: $("#player3_weaknesses").val()
+                },
+                {
+                    name: $("#player4_name").val(),
+                    strengths: $("#player4_strengths").val(),
+                    weaknesses: $("#player4_weaknesses").val()
+                },
+                {
+                    name: $("#player5_name").val(),
+                    strengths: $("#player5_strengths").val(),
+                    weaknesses: $("#player5_weaknesses").val()
+                }
+            ];
+
+            let defense = $("#defense_input").val();
+
+            // Debugging: Print the data before sending
+            console.log("Collected players:", players);
+            console.log("Collected defense:", defense);
+
+            // AJAX call to generate the offensive play
+            $.ajax({
+                type: "POST",
+                url: "/submit_players",
+                data: JSON.stringify({ players: players, defense: defense }),
+                contentType: "application/json",
+                beforeSend: function () {
+                    console.log("Generating offensive play...");
+                    $("#spinner-div").show();
+                },
+                success: function (response) {
+                    console.log("Response received:", response);
+                    if (response.generated_play) {
+                        window.location.href = "/generate-play";
+                    } else {
+                        alert("Error: No play was generated.");
+                    }
+                },
+                error: function (error) {
+                    console.error("AJAX Error:", error);
+                    alert("An error occurred while generating the play.");
+                },
+                complete: function () {
+                    $("#spinner-div").hide();
+                }
+            });
+        });
+
+        // Handle "Generate Inbound Play" button click
+        $("#generate_inbound_play_btn").click(function () {
+            var players = [
+                {
+                    name: $("#player1_name").val(),
+                    strengths: $("#player1_strengths").val(),
+                    weaknesses: $("#player1_weaknesses").val()
+                },
+                {
+                    name: $("#player2_name").val(),
+                    strengths: $("#player2_strengths").val(),
+                    weaknesses: $("#player2_weaknesses").val()
+                },
+                {
+                    name: $("#player3_name").val(),
+                    strengths: $("#player3_strengths").val(),
+                    weaknesses: $("#player3_weaknesses").val()
+                },
+                {
+                    name: $("#player4_name").val(),
+                    strengths: $("#player4_strengths").val(),
+                    weaknesses: $("#player4_weaknesses").val()
+                },
+                {
+                    name: $("#player5_name").val(),
+                    strengths: $("#player5_strengths").val(),
+                    weaknesses: $("#player5_weaknesses").val()
+                }
+            ];
+
+            let defense = $("#defense_input").val();
+
+            // AJAX call to generate the inbound play
+            $.ajax({
+                type: "POST",
+                url: "/submit_players",
+                data: JSON.stringify({ players: players, defense: defense }),
+                contentType: "application/json",
+                beforeSend: function () {
+                    console.log("Generating inbounds play...");
+                    $("#spinner-div").show();
+                },
+                success: function () {
+                    // Redirect to the inbound-play page after submitting the data
+                    window.location.href = "/inbound-play";
+                },
+                error: function (error) {
+                    console.error("AJAX Error:", error);
+                    alert("An error occurred while submitting the player data.");
+                },
+                complete: function () {
+                    $("#spinner-div").hide();
+                }
+            });
+        });
+    });
+
+</script>
+
+{% endblock %}

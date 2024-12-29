@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Generated Play Section -->
+<div id="show_play_div">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <br><br><br>
+            <h2 class="court-title">Draw your play on the court to help visualize the motion</h2>
+        </div>
+    </div>
+
+    <!-- Generated Play and Court Side by Side -->
+    <div class="row mt-5 justify-content-center">
+        <!-- Generated Play Text Column -->
+        <div class="col-md-6">
+            <div class="generated-play-output">
+                <h5><strong>Generated Play:</strong></h5>
+                <div id="generated_play_text" class="play-text-output">
+                    <!-- The generated play will be inserted here -->
+                </div>
+                <!-- Download Button -->
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-12 text-center">
+                        <button id="downloadPdfBtn" class="btn btn-primary mt-3 btn-download">Download Play as PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Court Column -->
+        <div class="col-md-6">
+            <div class="court-container">
+                <canvas id="courtCanvas" width="675" height="430" style="border: 1px solid #000;"></canvas>
+            </div>
+
+            <!-- Flex container for checkboxes -->
+            <div class="checkbox-container mt-3 d-flex justify-content-center">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="drawMode"> Enable Draw Mode
+                </label>
+                <label class="checkbox-label ml-3">
+                    <input type="checkbox" id="eraseMode"> Enable Erase Mode
+                </label>
+            </div>
+
+            <!-- Refine Play Section Directly Below Court -->
+            <div class="player-input mt-4 p-4"> <!-- Added refine-input for custom styles -->
+                <h5>Refine Play (if a player is having an off night):</h5>
+                <input type="text" id="player_off_night" placeholder="Enter player name">
+                <button id="refine_play_btn" class="btn-primary">Refine Play</button> <!-- Corrected ID -->
+            </div>
+
+            <div class="row mt-4 justify-content-center">
+                <div class="col-md-12 text-left">
+                    <button id="inbounds_play_btn" class="btn btn-primary" onclick="location.href='/inbound-play';">
+                        Make an Inbounds Play
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var play_data = {{ data| tojson }}; // Play data passed from the backend
+
+    // Pretty print play data for debugging
+    function print_play_data() {
+        console.log("Current play_data:", JSON.stringify(play_data, null, 3));
+
+        // Print players for debugging
+        if (play_data.players) {
+            console.log("Players Information:");
+            play_data.players.forEach(function(player) {
+                console.log(`Name: ${player.name}, Strengths: ${player.strengths}, Weaknesses: ${player.weaknesses}`);
+            });
+        } else {
+            console.log("No players found in play_data.");
+        }
+    }
+
+    $(document).ready(function () {
+        // Load play data and show the play
+        load_play_data();
+        print_play_data();  // Call the function to print player data
+    });
+
+    function load_play_data() {
+        let play = $.trim(play_data["generated_play"]);
+        if (play !== "") {
+            console.log("Loaded generated play from play_data:", play);
+            show_play(play_data);
+        } else {
+            console.log("No play found in play_data.");
+            $("#generated_play_text").text("No play was generated.");
+        }
+    }
+
+    function show_play(data) {
+        console.log("Displaying generated play:", data["generated_play"]);
+        $("#generated_play_text").text(data["generated_play"]);
+    }
+
+    /*
+        REFINE PLAY
+    */
+    $(function () {
+        $("#refine_play_btn").click(function () {
+            let player_name = $("#player_off_night").val();
+            console.log("Refining play for player having an off night:", player_name);
+            refine_play(player_name);
+        });
+    });
+
+function refine_play(player_name) {
+    let data = { "player_name": player_name };
+    $.ajax({
+        type: "POST",
+        url: "/refine_play",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(data),
+
+        beforeSend: function () {
+            console.log("Sending player off night refinement to backend:", data);
+            $("#spinner-div").show(); // Show spinner
+        },
+
+        success: function (response) {
+            console.log("Success - received refined play response:", response);
+            if (response.generated_play) {
+                play_data = response;
+                show_play(play_data);
+            } else {
+                console.log("Error: No refined play generated.");
+            }
+        },
+
+        error: function (request, status, error) {
+            console.log("AJAX Error during play refinement:", error);
+        },
+
+        complete: function () {
+            $("#spinner-div").hide(); // Hide spinner
+        },
+    });
+}
+
+</script>
+<script src="/static/court.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="/static/download.js"></script>
+
+
+{% endblock %}

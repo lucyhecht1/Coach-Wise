@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Inbound Play Section -->
+<div id="show_inbound_play_div">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <br><br><br>
+            <h2 class="court-title">Draw your inbounds play on the court to help visualize the motion</h2>
+        </div>
+    </div>
+
+    <!-- Inbound Play and Court Side by Side -->
+    <div class="row mt-5 justify-content-center">
+        <!-- Inbound Play Text Column -->
+        <div class="col-md-6">
+            <div class="generated-play-output">
+                <h5><strong>Generated Inbounds Play:</strong></h5>
+                <div id="generated_inbound_play_text" class="play-text-output">
+                    <!-- The generated inbound play will be inserted here -->
+                </div>
+                <!-- Download PDF Button -->
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-12 text-center">
+                        <button id="downloadInboundPdfBtn" class="btn btn-primary mt-3 btn-download">Download Play as PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Court Column -->
+        <div class="col-md-6">
+            <div class="court-container">
+                <canvas id="courtCanvasInbound" width="550" height="450" style="border: 1px solid #000;"></canvas>
+            </div>
+
+            <!-- Flex container for checkboxes -->
+            <div class="checkbox-container mt-3 d-flex justify-content-center">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="drawModeInbound"> Enable Draw Mode
+                </label>
+                <label class="checkbox-label ml-3">
+                    <input type="checkbox" id="eraseModeInbound"> Enable Erase Mode
+                </label>
+            </div>
+            
+            <!-- Regenerate Play Button -->
+             <br>
+            <button id="regenerate_play_btn" class="btn btn-secondary mt-3">Regenerate Play</button>
+            <br>
+            <button id="inbounds_play_btn" class="btn btn-primary" onclick="location.href='/generate-play';">
+                    Make an Offensive Play 
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /*
+        INIT
+    */
+    var play_data = {{ data | tojson }}; // Inbound play data passed from the backend
+
+    $(document).ready(function () {
+        // Load and display the initial play
+        load_inbound_play_data();
+
+        // Handle the "Regenerate Play" button click
+        $("#regenerate_play_btn").click(function () {
+            console.log("Regenerate button clicked.");
+            regenerate_new_inbound_play();
+        });
+    });
+
+    // Function to load the inbound play data
+    function load_inbound_play_data() {
+        let play = $.trim(play_data["inbound_play"]);
+        if (play !== "") {
+            console.log("Loaded generated inbound play from play_data:", play);
+            show_inbound_play(play_data);
+        } else {
+            console.log("No inbound play found in play_data.");
+            $("#generated_inbound_play_text").text("No inbounds play was generated.");
+        }
+    }
+
+    // Function to display the inbound play
+    function show_inbound_play(data) {
+        console.log("Displaying generated inbound play:", data["inbound_play"]);
+        $("#generated_inbound_play_text").text(data["inbound_play"]);
+    }
+
+    // Function to regenerate a new inbound play using the new_imbound function
+    function regenerate_new_inbound_play() {
+        const players = play_data.players; // Access the stored players
+        const defense = play_data.defense; // Access the stored defense
+        $.ajax({
+            type: "POST",
+            url: "/new_inbound_play",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                console.log("Requesting a new inbound play using new_imbound...");
+                $("#spinner-div").show();
+            },
+            success: function (response) {
+                console.log("Received new inbound play response:", response);
+                if (response.inbound_play) {
+                    play_data = response;
+                    show_inbound_play(play_data);
+                } else {
+                    console.log("Error: No new inbound play generated.");
+                    $("#generated_inbound_play_text").text("Error: No new inbound play was generated.");
+                }
+            },
+            error: function (request, status, error) {
+                console.error("AJAX Error during new inbound play generation:", error);
+            },
+            complete: function () {
+                $("#spinner-div").hide();
+            }
+        });
+    }
+</script>
+<script src="/static/halfcourt.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="/static/download.js"></script>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+
+  <!-- jquery -->
+  <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+
+
+  <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+
+  <title>CoachWise</title>
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="/">CoachWise</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <!-- Welcome Page Link -->
+        <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+          <a class="nav-link" href="/">Welcome</a>
+        </li>
+        <!-- Team Setup Link -->
+        <li class="nav-item {% if request.path == '/home' %}active{% endif %}">
+          <a class="nav-link" href="/home">Setup</a>
+        </li>
+        <!-- Offensive Play Link -->
+        <li class="nav-item {% if request.path == '/generate-play' %}active{% endif %}">
+          <a class="nav-link" href="/generate-play">Offensive Play</a>
+        </li>
+        <!-- Inbounds Play Link -->
+        <li class="nav-item {% if request.path == '/inbound-play' %}active{% endif %}">
+          <a class="nav-link" href="/inbound-play">Inbounds Play</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  
+
+  <div id="spinner-div" class="pt-5">
+    <div class="spinner-border text-primary" role="status">
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+</body>
+
+</html>
