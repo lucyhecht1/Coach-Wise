@@ -1,0 +1,16 @@
+# Ignore sensitive environment files
+.env
+
+# Ignore compiled Python files and cache
+__pycache__/
+*.pyc
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+
