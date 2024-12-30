@@ -1,5 +1,5 @@
-## CoachWise: Making Coaching Accessible
-**CoachWise** is an AI-powered web application designed to assist basketball coaches in creating, refining, and visualizing custom basketball plays. The site offers two core functionalities: creating offensive plays and/or inbounds plays, both tailored to your team’s specific needs.
+# CoachWise: Making Coaching Accessible
+**CoachWise** is an AI-powered web application designed to assist basketball coaches in creating, refining, and visualizing custom basketball plays. The site offers two core functionalities: creating **offensive plays** and/or **inbounds plays**, both tailored to your team’s specific needs.
 
 
 ## Features
@@ -14,8 +14,9 @@
 * Backend: Flask (Python) for web framework, OpenAI API for generating plays
 * Other tools: jsPDF for PDF generation, HTML5 Canvas for play drawing
 
-# Installation
-Note: You must have a valid OpenAI API key.
+## Installation
+**Note:** You must have a valid OpenAI API key to run this program.
+
 Clone this repository:
 ```
 git clone https://github.com/your-username/Coach-Wise.git
