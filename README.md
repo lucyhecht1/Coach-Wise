@@ -30,8 +30,7 @@ Install dependencies:
 npm install
 pip install flask
 ```
-**Set up the Environment Variables**
-Create a ``.env`` file in the project root directory to securely store your OpenAI API key. Add the following line to the ``.env`` file:
+**Set up the Environment Variables**: Create a ``.env`` file in the project root directory to securely store your OpenAI API key. Add the following line to the ``.env`` file:
 ```
 OPENAI_API_KEY="your-api-key"
 ```
